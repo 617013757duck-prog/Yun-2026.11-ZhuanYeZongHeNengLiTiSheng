@@ -1,0 +1,178 @@
+{
+  "model": "LightGBM v2 (A15 重训)",
+  "params": {
+    "objective": "binary",
+    "metric": "auc",
+    "n_estimators": 2000,
+    "learning_rate": 0.05,
+    "num_leaves": 127,
+    "min_child_samples": 50,
+    "subsample": 0.8,
+    "bagging_freq": 5,
+    "colsample_bytree": 0.8,
+    "scale_pos_weight": 1.0,
+    "random_state": 42,
+    "n_jobs": -1,
+    "force_col_wise": true
+  },
+  "feature_count": 422,
+  "best_iteration": 1542,
+  "train_seconds": 48.3,
+  "imbalance_strategy": "scale_pos_weight=1 + threshold tuning",
+  "thresholds": {
+    "alert": 0.17,
+    "warn": 0.08,
+    "strict": 0.11,
+    "policy": "告警线=验证集 F1 最优; 关注线=在 F1 不低于告警线 95% 且误报率不超过 2.5 倍的前提下取召回最高; 严格线=误报率≤0.5%。三条线均由验证集数据决定, 模型换分数尺度时自动随之变化。"
+  },
+  "default_threshold": {
+    "threshold": 0.5,
+    "accuracy": 0.9874,
+    "precision": 0.9675,
+    "recall": 0.6627,
+    "f1": 0.7866,
+    "fpr": 0.0008,
+    "roc_auc": 0.971,
+    "pr_auc": 0.8659,
+    "confusion": {
+      "tp": 2739,
+      "fp": 92,
+      "tn": 113883,
+      "fn": 1394
+    }
+  },
+  "tuned_threshold": {
+    "threshold": 0.17,
+    "accuracy": 0.9884,
+    "precision": 0.8985,
+    "recall": 0.7539,
+    "f1": 0.8199,
+    "fpr": 0.0031,
+    "roc_auc": 0.971,
+    "pr_auc": 0.8659,
+    "confusion": {
+      "tp": 3116,
+      "fp": 352,
+      "tn": 113623,
+      "fn": 1017
+    }
+  },
+  "time_split": {
+    "v1": {
+      "old_threshold": {
+        "threshold": 0.17,
+        "accuracy": 0.8478,
+        "precision": 0.1572,
+        "recall": 0.7852,
+        "f1": 0.262,
+        "fpr": 0.15,
+        "roc_auc": 0.8959,
+        "pr_auc": 0.5214,
+        "confusion": {
+          "tp": 3191,
+          "fp": 17108,
+          "tn": 96936,
+          "fn": 873
+        }
+      },
+      "recalibrated_threshold": {
+        "threshold": 0.68,
+        "accuracy": 0.9708,
+        "precision": 0.6034,
+        "recall": 0.4392,
+        "f1": 0.5084,
+        "fpr": 0.0103,
+        "roc_auc": 0.8959,
+        "pr_auc": 0.5214,
+        "confusion": {
+          "tp": 1785,
+          "fp": 1173,
+          "tn": 112871,
+          "fn": 2279
+        }
+      },
+      "recalibrated_value": 0.68,
+      "oracle_threshold": {
+        "threshold": 0.7,
+        "accuracy": 0.9717,
+        "precision": 0.6305,
+        "recall": 0.4304,
+        "f1": 0.5116,
+        "fpr": 0.009,
+        "roc_auc": 0.8959,
+        "pr_auc": 0.5214,
+        "confusion": {
+          "tp": 1749,
+          "fp": 1025,
+          "tn": 113019,
+          "fn": 2315
+        }
+      },
+      "oracle_note": "在测试集上直接选最优阈值得到的 F1 上限, 现实中不可用, 仅用于区分'排序能力下降'与'阈值失效'",
+      "train_seconds": 17.2,
+      "val_f1": 0.5895
+    },
+    "v2": {
+      "old_threshold": {
+        "threshold": 0.17,
+        "accuracy": 0.9695,
+        "precision": 0.5679,
+        "recall": 0.4754,
+        "f1": 0.5175,
+        "fpr": 0.0129,
+        "roc_auc": 0.9116,
+        "pr_auc": 0.5407,
+        "confusion": {
+          "tp": 1932,
+          "fp": 1470,
+          "tn": 112574,
+          "fn": 2132
+        }
+      },
+      "recalibrated_threshold": {
+        "threshold": 0.17,
+        "accuracy": 0.9695,
+        "precision": 0.5679,
+        "recall": 0.4754,
+        "f1": 0.5175,
+        "fpr": 0.0129,
+        "roc_auc": 0.9116,
+        "pr_auc": 0.5407,
+        "confusion": {
+          "tp": 1932,
+          "fp": 1470,
+          "tn": 112574,
+          "fn": 2132
+        }
+      },
+      "recalibrated_value": 0.17,
+      "oracle_threshold": {
+        "threshold": 0.22,
+        "accuracy": 0.9718,
+        "precision": 0.6293,
+        "recall": 0.4414,
+        "f1": 0.5189,
+        "fpr": 0.0093,
+        "roc_auc": 0.9116,
+        "pr_auc": 0.5407,
+        "confusion": {
+          "tp": 1794,
+          "fp": 1057,
+          "tn": 112987,
+          "fn": 2270
+        }
+      },
+      "oracle_note": "在测试集上直接选最优阈值得到的 F1 上限, 现实中不可用, 仅用于区分'排序能力下降'与'阈值失效'",
+      "train_seconds": 14.3,
+      "val_f1": 0.614
+    },
+    "train_seconds": 14.3
+  },
+  "baseline_v1": {
+    "f1": 0.7577,
+    "fpr": 0.0045,
+    "roc_auc": 0.9643,
+    "pr_auc": 0.8073,
+    "time_split_f1": 0.5469
+  }
+}

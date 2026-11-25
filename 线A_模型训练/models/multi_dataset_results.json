@@ -1,0 +1,195 @@
+{
+  "protocol": "60/20/20 分层划分, 20% 验证选阈值, 20% 测试只评估一次",
+  "D1_ulb": {
+    "desc": "信用卡交易（PCA 脱敏特征）",
+    "rows": 284807,
+    "features": 29,
+    "fraud_rate": 0.001727,
+    "results": {
+      "v1_原配置": {
+        "threshold": 0.14,
+        "accuracy": 0.9739,
+        "precision": 0.0539,
+        "recall": 0.8485,
+        "f1": 0.1014,
+        "fpr": 0.02592,
+        "roc_auc": 0.9112,
+        "pr_auc": 0.0461,
+        "confusion": {
+          "tp": 84,
+          "fp": 1474,
+          "tn": 55389,
+          "fn": 15
+        },
+        "scale_pos_weight": 578.27,
+        "num_leaves": 64,
+        "best_iteration": 42,
+        "train_seconds": 1.1
+      },
+      "v2_修正配置": {
+        "threshold": 0.01,
+        "accuracy": 0.9995,
+        "precision": 0.9091,
+        "recall": 0.8081,
+        "f1": 0.8556,
+        "fpr": 0.00014,
+        "roc_auc": 0.9689,
+        "pr_auc": 0.8736,
+        "confusion": {
+          "tp": 80,
+          "fp": 8,
+          "tn": 56855,
+          "fn": 19
+        },
+        "scale_pos_weight": 1.0,
+        "num_leaves": 127,
+        "best_iteration": 270,
+        "train_seconds": 2.9
+      }
+    }
+  },
+  "D2_nooha": {
+    "desc": "信用卡消费（客户档案 + 金额 + 商户）",
+    "rows": 1323347,
+    "features": 16,
+    "fraud_rate": 0.00334,
+    "results": {
+      "v1_原配置": {
+        "threshold": 0.95,
+        "accuracy": 0.9487,
+        "precision": 0.0549,
+        "recall": 0.8857,
+        "f1": 0.1035,
+        "fpr": 0.05105,
+        "roc_auc": 0.9612,
+        "pr_auc": 0.1723,
+        "confusion": {
+          "tp": 783,
+          "fp": 13467,
+          "tn": 250319,
+          "fn": 101
+        },
+        "scale_pos_weight": 298.4,
+        "num_leaves": 64,
+        "best_iteration": 1,
+        "train_seconds": 4.4
+      },
+      "v2_修正配置": {
+        "threshold": 0.03,
+        "accuracy": 0.9995,
+        "precision": 0.9634,
+        "recall": 0.8937,
+        "f1": 0.9272,
+        "fpr": 0.00011,
+        "roc_auc": 0.9988,
+        "pr_auc": 0.9652,
+        "confusion": {
+          "tp": 790,
+          "fp": 30,
+          "tn": 263756,
+          "fn": 94
+        },
+        "scale_pos_weight": 1.0,
+        "num_leaves": 127,
+        "best_iteration": 845,
+        "train_seconds": 27.5
+      }
+    }
+  },
+  "D3_sparkov": {
+    "desc": "商户交易（业务特征）",
+    "rows": 300000,
+    "features": 15,
+    "fraud_rate": 0.007517,
+    "results": {
+      "v1_原配置": {
+        "threshold": 0.64,
+        "accuracy": 0.9987,
+        "precision": 0.9583,
+        "recall": 0.867,
+        "f1": 0.9104,
+        "fpr": 0.00029,
+        "roc_auc": 0.9989,
+        "pr_auc": 0.9639,
+        "confusion": {
+          "tp": 391,
+          "fp": 17,
+          "tn": 59532,
+          "fn": 60
+        },
+        "scale_pos_weight": 132.04,
+        "num_leaves": 64,
+        "best_iteration": 988,
+        "train_seconds": 8.8
+      },
+      "v2_修正配置": {
+        "threshold": 0.06,
+        "accuracy": 0.9986,
+        "precision": 0.9467,
+        "recall": 0.867,
+        "f1": 0.9051,
+        "fpr": 0.00037,
+        "roc_auc": 0.999,
+        "pr_auc": 0.9579,
+        "confusion": {
+          "tp": 391,
+          "fp": 22,
+          "tn": 59527,
+          "fn": 60
+        },
+        "scale_pos_weight": 1.0,
+        "num_leaves": 127,
+        "best_iteration": 756,
+        "train_seconds": 8.0
+      }
+    }
+  },
+  "D4_synthetic": {
+    "desc": "银行交易合成集（设备与风控特征）",
+    "rows": 5000,
+    "features": 34,
+    "fraud_rate": 0.0146,
+    "results": {
+      "v1_原配置": {
+        "threshold": 0.01,
+        "accuracy": 0.995,
+        "precision": 1.0,
+        "recall": 0.6429,
+        "f1": 0.7826,
+        "fpr": 0.0,
+        "roc_auc": 0.9939,
+        "pr_auc": 0.8963,
+        "confusion": {
+          "tp": 9,
+          "fp": 0,
+          "tn": 986,
+          "fn": 5
+        },
+        "scale_pos_weight": 67.18,
+        "num_leaves": 64,
+        "best_iteration": 525,
+        "train_seconds": 0.9
+      },
+      "v2_修正配置": {
+        "threshold": 0.12,
+        "accuracy": 0.991,
+        "precision": 0.6667,
+        "recall": 0.7143,
+        "f1": 0.6897,
+        "fpr": 0.00507,
+        "roc_auc": 0.9971,
+        "pr_auc": 0.8701,
+        "confusion": {
+          "tp": 10,
+          "fp": 5,
+          "tn": 981,
+          "fn": 4
+        },
+        "scale_pos_weight": 1.0,
+        "num_leaves": 127,
+        "best_iteration": 45,
+        "train_seconds": 0.5
+      }
+    }
+  }
+}

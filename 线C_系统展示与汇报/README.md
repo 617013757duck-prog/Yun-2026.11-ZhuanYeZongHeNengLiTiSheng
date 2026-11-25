@@ -57,7 +57,7 @@ python demo_cli.py 你的.csv   # 指定预处理后的 CSV
 
 | 任务 | 模型文件 | 输出 | 判定 |
 | --- | --- | --- | --- |
-| 异常交易检测 | `线A_模型训练/models/lgbm_fraud_baseline.txt` | 欺诈概率 | ≥ **0.79**（验证集 F1 最优阈值）触发告警 |
+| 异常交易检测 | `线A_模型训练/models/lgbm_fraud_final.txt` | 欺诈概率 | ≥ **0.17**（验证集 F1 最优阈值）触发告警 |
 | 数据分类 | `线A_模型训练/models/lgbm_product_classifier.txt` | 5 类概率 | argmax → C / H / R / S / W |
 
 两个模型特征名与顺序一致（422 列），代码按模型特征顺序自动重排输入。

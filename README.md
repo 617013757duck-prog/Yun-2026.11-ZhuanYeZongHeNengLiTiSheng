@@ -9,10 +9,14 @@
 
 | 任务 | Accuracy | F1 | 误报率 FPR | 其他 |
 | --- | --- | --- | --- | --- |
-| 异常交易检测（阈值 0.79） | 98.46% | 75.77% | 0.45% | ROC-AUC 0.9643、PR-AUC 0.8073 |
+| 异常交易检测（告警线 0.17） | 98.84% | 81.99% | 0.31% | ROC-AUC 0.9710、PR-AUC 0.8659 |
 | 数据分类 | 99.89% | Macro-F1 99.63% | — | Weighted-F1 99.89% |
 
 模型统一采用 LightGBM，选型依据见 `线A_模型训练/models/model_selection_*.json`。
+
+正式模型为 v2（`models/lgbm_fraud_final.txt`），按 A8/A9 的实验结论重训：`num_leaves` 64→127、轮数上限 2000（早停 1542）、`scale_pos_weight` 27.58→1。相比期中版本 F1 从 75.77% 提升到 81.99%，误报率从 0.45% 降到 0.31%，精度与召回同时改善。
+
+三级阈值由验证集数据自动推导，随模型产物携带：告警线 0.17（F1 最优）、关注线 0.08、严格线 0.11（误报率 ≤0.5%）。
 
 ## 目录结构
 
@@ -45,6 +49,7 @@ python ".\线A_模型训练\model_selection.py"
 python ".\线A_模型训练\train_fraud_baseline.py"
 python ".\线A_模型训练\train_product_classifier.py"
 python ".\线A_模型训练\evaluate_report.py"
+python ".\线A_模型训练\retrain_final.py"   # 生成正式模型 v2
 ```
 
 `数据集/processed/` 已包含预处理结果（`train.csv.gz`、`test.csv.gz`、`category_mapping.json`），只跑训练脚本时可跳过 `preprocess.py`。
@@ -58,13 +63,21 @@ python ".\线A_模型训练\training_curve.py"       # A7 训练曲线、学习�
 python ".\线A_模型训练\hyperparam_search.py"     # A8 四组超参数实验
 python ".\线A_模型训练\ablation_study.py"        # A9 六组消融实验
 python ".\线A_模型训练\robustness_check.py"      # A10 5 种子 / 5 折 / 时间外推
+python ".\线A_模型训练\retrain_final.py"         # A15 主线模型重训（v2）+ 三线阈值
+python ".\线A_模型训练\test_inference_api.py"    # A11 接口用例（30 项断言）
 python ".\线A_模型训练\external_validation.py"    # A14 外部数据集（ULB 信用卡欺诈）复现
+python ".\线A_模型训练\multi_dataset_validation.py"  # A16 四数据集复现验证
 python ".\线A_模型训练\batch_predict.py" --input 样例.csv --output 结果.csv --mode raw
 ```
 
 完整方法、实验数据与结论见 [A13 模型与实验报告](线A_模型训练/A13_模型与实验报告.md)。
-关键稳定性结论：5 种子 F1 **0.7596 ± 0.0018**，5 折 CV **0.7207 ± 0.0076**，时间外推 F1 **0.5469**（AUC 仍保留 0.9087）。
-外部复现：在独立的 ULB 信用卡欺诈数据集（284,807 行，欺诈 0.17%）上用同一流程重训，PR-AUC **0.487**（随机基线 282 倍）、FPR **0.1%** 量级，说明方法可跨数据集复现；但模型文件不可跨库直接迁移。
+
+关键结论：
+
+- **稳定性**：5 种子 F1 **0.7596 ± 0.0018**，5 折 CV **0.7207 ± 0.0076**
+- **时间外推**：F1 降至 0.51，但 AUC 保留 0.91 —— 排序能力几乎不衰减，掉分来自固定阈值失效，部署需按月重校准
+- **多数据集复现**：在 ULB（28.5 万）、Nooha（132 万）、Sparkov（30 万）、银行交易合成集（5 千）上用同一流程重训，ROC-AUC 全部 ≥ 0.9689、PR-AUC ≥ 0.8659，说明方法可跨数据集复现；但模型文件不可跨库直接迁移
+- **反直觉结论**：类别权重与阈值调优应择一不可叠加（IEEE-CIS 上 spw=1 使 F1 +3.97%，ULB 上 v2 配置比 v1 高 8 倍 F1）
 
 ## 运行演示系统
 
@@ -94,5 +107,5 @@ python ".\线B_数据处理与文档\复现EDA.py"
 
 - 合并后 434 列 → 剔除缺失率 >99% 的 9 列 → **422 列建模特征**
 - 训练 / 测试：**472,432 / 118,108 行**，按 `isFraud` 分层 80/20
-- 欺诈样本占比 **3.499%**，采用 `scale_pos_weight = 27.58` + 阈值调优
-- 模型选型使用 12 万行子集（F1 0.6227），最终指标使用全量（F1 0.7577），两者不可混用
+- 欺诈样本占比 **3.499%**，采用 `scale_pos_weight = 1` + 验证集阈值调优（不叠加类别权重）
+- 模型选型使用 12 万行子集（F1 0.6227），最终指标使用全量（F1 0.8199），两者不可混用

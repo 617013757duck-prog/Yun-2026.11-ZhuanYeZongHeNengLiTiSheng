@@ -15,14 +15,15 @@
 
 依赖产物(均由 preprocess.py 生成):
     数据集/processed/category_mapping.json
-    线A_模型训练/models/lgbm_fraud_baseline.txt
+    线A_模型训练/models/lgbm_fraud_final.txt
     线A_模型训练/models/lgbm_product_classifier.txt
-    线A_模型训练/models/metrics_fraud_baseline.json
+    线A_模型训练/models/metrics_fraud_final.json
 """
 from __future__ import annotations
 
 import json
 import os
+import io
 from pathlib import Path
 
 import lightgbm as lgb
@@ -33,9 +34,9 @@ BASE = Path(__file__).resolve().parent
 PROC = BASE.parent / "数据集" / "processed"
 MODEL_DIR = BASE / "models"
 
-FRAUD_MODEL = MODEL_DIR / "lgbm_fraud_baseline.txt"
+FRAUD_MODEL = MODEL_DIR / "lgbm_fraud_final.txt"
 PRODUCT_MODEL = MODEL_DIR / "lgbm_product_classifier.txt"
-FRAUD_METRICS = MODEL_DIR / "metrics_fraud_baseline.json"
+FRAUD_METRICS = MODEL_DIR / "metrics_fraud_final.json"
 PRODUCT_METRICS = MODEL_DIR / "metrics_product_classifier.json"
 MAPPING = PROC / "category_mapping.json"
 SPEC_CACHE = MODEL_DIR / "feature_spec.json"
@@ -43,7 +44,7 @@ SPEC_CACHE = MODEL_DIR / "feature_spec.json"
 LABEL_COLUMNS = ["isFraud", "ProductCD", "ProductCD_label"]
 REQUIRED_RAW = ["TransactionAmt", "TransactionDT", "card1", "card4", "card6"]
 
-WARN_THRESHOLD = 0.50  # 关注线, 与线C《告警展示设计》一致(0.50-0.79 为关注)
+WARN_THRESHOLD = 0.08  # 关注线兜底值, 正常由 metrics_fraud_final.json 的 thresholds.warn 覆盖
 
 
 # ============ 异常类型(与前端错误码 E01-E07 对应) ============
@@ -108,6 +109,10 @@ class _Bundle:
         with open(FRAUD_METRICS, encoding="utf-8") as f:
             fm = json.load(f)
         self.threshold = float(fm["tuned_threshold"]["threshold"])
+        th = fm.get("thresholds") or {}
+        self.warn_threshold = float(th.get("warn", WARN_THRESHOLD))
+        self.strict_threshold = float(th.get("strict", self.threshold))
+        self.model_version = str(fm.get("model", "LightGBM"))
         with open(PRODUCT_METRICS, encoding="utf-8") as f:
             pm = json.load(f)
         self.product_reverse = {v: k for k, v in pm["classes"].items()} \
@@ -172,7 +177,13 @@ def _align(df: pd.DataFrame, mode: str):
                 unknown = int(mapping.get("Unknown", 0))
                 cols[c] = s.fillna(unknown).astype("int32")
             else:
-                v = pd.to_numeric(df[c], errors="coerce")
+                raw_s = df[c]
+                v = pd.to_numeric(raw_s, errors="coerce")
+                # 原值非空但转不成数值 = 脏数据, 报错(E02); 原值为空则按缺失填充
+                bad = v.isna() & raw_s.notna()
+                if bad.any():
+                    idx = raw_s.index[bad][0]
+                    raise InvalidTypeError(int(idx) + 2, c, raw_s.at[idx])
                 cols[c] = v.fillna(b.spec["fill_values"][c]).astype("float64")
         else:
             fill = b.spec["fill_values"][c]
@@ -183,10 +194,12 @@ def _align(df: pd.DataFrame, mode: str):
     return X
 
 
-def _risk(score: float, threshold: float):
+def _risk(score: float, threshold: float, warn: float = None):
     if score >= threshold:
         return "高风险", "拦截"
-    if score >= WARN_THRESHOLD:
+    if warn is None:
+        warn = WARN_THRESHOLD
+    if score >= warn:
         return "关注", "复核"
     return "正常", "放行"
 
@@ -220,8 +233,8 @@ def predict_batch(df: pd.DataFrame, threshold: float | None = None,
     out["ProductCD_pred"] = _product_names(pidx)
     out["ProductCD_confidence"] = np.round(pconf, 4)
     out["fraud_score"] = np.round(score, 6)
-    out["risk_level"] = [ _risk(s, th)[0] for s in score ]
-    out["decision"] = [ _risk(s, th)[1] for s in score ]
+    out["risk_level"] = [ _risk(s, th, b.warn_threshold)[0] for s in score ]
+    out["decision"] = [ _risk(s, th, b.warn_threshold)[1] for s in score ]
     return out
 
 
@@ -248,6 +261,16 @@ def predict_one(record: dict, threshold: float | None = None) -> dict:
         "decision": row["decision"],
         "top_reasons": reasons,
     }
+
+
+def read_csv_bytes(payload: bytes) -> pd.DataFrame:
+    """从原始字节读取 CSV, 兼容 UTF-8(BOM) 与 GBK(Excel 另存)。"""
+    for enc in ("utf-8-sig", "gbk"):
+        try:
+            return pd.read_csv(io.BytesIO(payload), encoding=enc)
+        except UnicodeDecodeError:
+            continue
+    raise EncodingError("无法识别 CSV 编码, 请使用 UTF-8 或 GBK 保存")
 
 
 def quality_report(df: pd.DataFrame) -> dict:

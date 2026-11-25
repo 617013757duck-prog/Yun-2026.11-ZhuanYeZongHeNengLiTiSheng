@@ -5,8 +5,8 @@
 加载线A训练好的两个 LightGBM 模型, 提供统一的输入校验与预测接口, 供
 Streamlit 演示页和命令行自测脚本复用。
 
-- 欺诈模型: isFraud 二分类概率; 告警阈值读取自 metrics_fraud_baseline.json
-  的 tuned_threshold.threshold(0.79, 验证集 F1 最优)
+- 欺诈模型: isFraud 二分类概率; 告警阈值读取自 metrics_fraud_final.json
+  的 tuned_threshold.threshold, 关注线读取 thresholds.warn
 - 产品模型: ProductCD 五分类 (C/H/R/S/W)
 """
 import json
@@ -20,12 +20,12 @@ ROOT = Path(__file__).resolve().parent.parent
 MODEL_DIR = ROOT / "线A_模型训练" / "models"
 PROC_DIR = ROOT / "数据集" / "processed"
 
-FRAUD_MODEL = MODEL_DIR / "lgbm_fraud_baseline.txt"
+FRAUD_MODEL = MODEL_DIR / "lgbm_fraud_final.txt"
 PRODUCT_MODEL = MODEL_DIR / "lgbm_product_classifier.txt"
-FRAUD_METRICS = MODEL_DIR / "metrics_fraud_baseline.json"
+FRAUD_METRICS = MODEL_DIR / "metrics_fraud_final.json"
 PRODUCT_METRICS = MODEL_DIR / "metrics_product_classifier.json"
 
-WARN_THRESHOLD = 0.5  # “关注”预警线(低于告警线, 仅作人工复核提示)
+WARN_THRESHOLD = 0.08  # “关注”预警线兜底值, 正常由线A metrics 产物覆盖
 
 # 可选标签列: 上传文件中若带有真实标签, 仅用于对照, 不参与预测
 LABEL_COLUMNS = ["isFraud", "ProductCD", "ProductCD_label"]
@@ -49,7 +49,10 @@ class ModelBundle:
         fm = _read_json(FRAUD_METRICS)
         pm = _read_json(PRODUCT_METRICS)
         self.alert_threshold = float(fm["tuned_threshold"]["threshold"])
-        self.warn_threshold = WARN_THRESHOLD
+        th = fm.get("thresholds") or {}
+        self.warn_threshold = float(th.get("warn", WARN_THRESHOLD))
+        self.strict_threshold = float(th.get("strict", self.alert_threshold))
+        self.threshold_policy = th.get("policy", "")
         self.classes = list(pm.get("classes") or ["C", "H", "R", "S", "W"])
         self.fraud_metrics = fm.get("tuned_threshold", {})
         self.features = list(self.fraud.feature_name())

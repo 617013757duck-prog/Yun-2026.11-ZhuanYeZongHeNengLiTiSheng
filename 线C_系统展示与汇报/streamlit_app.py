@@ -416,7 +416,8 @@ cols[1].markdown(kpi("高风险告警", "%d" % info["alert_count"],
                      "分数 ≥ %.2f" % threshold, "alert", RED, "#FEF2F2"),
                  unsafe_allow_html=True)
 cols[2].markdown(kpi("关注", "%d" % info["warn_count"],
-                     "0.50 ≤ 分数 < %.2f" % threshold, "eye", AMBER, "#FFFBEB"),
+                     "%.2f ≤ 分数 < %.2f" % (bundle.warn_threshold, threshold),
+                     "eye", AMBER, "#FFFBEB"),
                  unsafe_allow_html=True)
 cols[3].markdown(kpi("告警率", "%.1f%%" % (100 * info["alert_rate"]),
                      "占全部交易比例", "pie", PRIMARY, "#EFF6FF"),

@@ -44,8 +44,12 @@ def summarize(df, elapsed):
     top = df.nlargest(10, "fraud_score")
     keep = [c for c in ["TransactionID", "TransactionAmt", "fraud_score",
                         "risk_level", "decision"] if c in top.columns]
+    b = api.load()
     return {
         "生成时间": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "模型版本": b.model_version,
+        "告警线": b.threshold,
+        "关注线": b.warn_threshold,
         "总笔数": int(n),
         "高风险": int(lv.get("高风险", 0)),
         "关注": int(lv.get("关注", 0)),
@@ -63,24 +67,36 @@ def summarize(df, elapsed):
 
 
 def check_drift(summary):
-    """与历史平均分数对比, 偏移超过 50% 记为漂移提醒。"""
+    """与历史运行对比, 平均分或告警率偏移超阈值即记为漂移提醒。
+
+    阈值与模型一起变, 所以漂移基线必须取自"同一模型版本"的历史记录,
+    否则更换模型后会被误报为漂移。
+    """
     if not os.path.exists(HISTORY):
         return None
     hist = []
     with open(HISTORY, encoding="utf-8") as f:
         for line in f:
             try:
-                hist.append(json.loads(line)["平均分数"])
+                rec = json.loads(line)
             except Exception:
                 continue
+            if rec.get("模型版本") != summary.get("模型版本"):
+                continue
+            hist.append(rec)
     if len(hist) < 3:
         return None
-    base = float(np.mean(hist))
-    cur = summary["平均分数"]
-    ratio = (cur - base) / base if base else 0
-    return {"历史基线均值": round(base, 4), "本次均值": cur,
+    base_score = float(np.mean([h["平均分数"] for h in hist]))
+    base_alert = float(np.mean([h["拦截率%"] for h in hist]))
+    cur_score = summary["平均分数"]
+    cur_alert = summary["拦截率%"]
+    ratio = (cur_score - base_score) / base_score if base_score else 0.0
+    alert_ratio = ((cur_alert - base_alert) / base_alert) if base_alert else 0.0
+    return {"历史基线均值": round(base_score, 4), "本次均值": cur_score,
             "相对偏移%": round(100 * ratio, 2),
-            "是否漂移": bool(abs(ratio) > 0.5)}
+            "基线拦截率%": round(base_alert, 2), "本次拦截率%": cur_alert,
+            "拦截率偏移%": round(100 * alert_ratio, 2),
+            "是否漂移": bool(abs(ratio) > 0.5 or abs(alert_ratio) > 0.5)}
 
 
 def main():
@@ -113,7 +129,9 @@ def main():
     os.makedirs(os.path.dirname(HISTORY), exist_ok=True)
     with open(HISTORY, "a", encoding="utf-8") as f:
         f.write(json.dumps({"时间": summary["生成时间"],
+                            "模型版本": summary["模型版本"],
                             "平均分数": summary["平均分数"],
+                            "拦截率%": summary["拦截率%"],
                             "高风险": summary["高风险"],
                             "总笔数": summary["总笔数"]}, ensure_ascii=False) + "\n")
 
