@@ -1,0 +1,51 @@
+{
+  "model": "LightGBM",
+  "params": {
+    "objective": "binary",
+    "metric": "auc",
+    "n_estimators": 1000,
+    "learning_rate": 0.05,
+    "num_leaves": 64,
+    "subsample": 0.8,
+    "bagging_freq": 5,
+    "colsample_bytree": 0.8,
+    "scale_pos_weight": 27.5803,
+    "random_state": 42,
+    "n_jobs": -1,
+    "force_col_wise": true
+  },
+  "best_iteration": 1000,
+  "imbalance_strategy": "scale_pos_weight=27.58 + threshold tuning",
+  "default_threshold": {
+    "threshold": 0.5,
+    "accuracy": 0.9677,
+    "precision": 0.5246,
+    "recall": 0.8229,
+    "f1": 0.6407,
+    "fpr": 0.027,
+    "roc_auc": 0.9643,
+    "pr_auc": 0.8073,
+    "confusion": {
+      "tp": 3401,
+      "fp": 3082,
+      "tn": 110893,
+      "fn": 732
+    }
+  },
+  "tuned_threshold": {
+    "threshold": 0.79,
+    "accuracy": 0.9846,
+    "precision": 0.8458,
+    "recall": 0.6862,
+    "f1": 0.7577,
+    "fpr": 0.0045,
+    "roc_auc": 0.9643,
+    "pr_auc": 0.8073,
+    "confusion": {
+      "tp": 2836,
+      "fp": 517,
+      "tn": 113458,
+      "fn": 1297
+    }
+  }
+}
