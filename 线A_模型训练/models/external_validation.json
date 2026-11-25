@@ -1,0 +1,120 @@
+{
+  "dataset": {
+    "name": "ULB Credit Card Fraud Detection",
+    "source": "OpenML id=1597 (Kaggle ULB 原始版本)",
+    "rows": 284807,
+    "features": 29,
+    "feature_columns": [
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8",
+      "V9",
+      "V10",
+      "V11",
+      "V12",
+      "V13",
+      "V14",
+      "V15",
+      "V16",
+      "V17",
+      "V18",
+      "V19",
+      "V20",
+      "V21",
+      "V22",
+      "V23",
+      "V24",
+      "V25",
+      "V26",
+      "V27",
+      "V28",
+      "Amount"
+    ],
+    "fraud_count": 492,
+    "fraud_rate": 0.001727,
+    "note": "OpenML 版本含 V1-V28 + Amount 共 29 个特征(Time 列被移除); 特征为 PCA 脱敏, 与 IEEE-CIS 特征空间不重叠, 因此只能复现方法, 不能直接套用已训练模型文件"
+  },
+  "params": {
+    "objective": "binary",
+    "metric": "auc",
+    "learning_rate": 0.05,
+    "num_leaves": 64,
+    "subsample": 0.8,
+    "bagging_freq": 5,
+    "colsample_bytree": 0.8,
+    "n_jobs": -1,
+    "force_col_wise": true
+  },
+  "rounds": 1000,
+  "E1_random_spw_ratio": {
+    "threshold": 0.05,
+    "accuracy": 0.7699,
+    "precision": 0.007,
+    "recall": 0.9388,
+    "f1": 0.0138,
+    "fpr": 0.23037,
+    "roc_auc": 0.8542,
+    "pr_auc": 0.0067,
+    "confusion": {
+      "tp": 92,
+      "fp": 13100,
+      "tn": 43764,
+      "fn": 6
+    },
+    "val_best_f1": 0.0132,
+    "train_seconds": 1.87,
+    "scale_pos_weight": 578.26
+  },
+  "E2_random_spw_1": {
+    "threshold": 0.36,
+    "accuracy": 0.9985,
+    "precision": 0.5489,
+    "recall": 0.7449,
+    "f1": 0.632,
+    "fpr": 0.00106,
+    "roc_auc": 0.9338,
+    "pr_auc": 0.4872,
+    "confusion": {
+      "tp": 73,
+      "fp": 60,
+      "tn": 56804,
+      "fn": 25
+    },
+    "val_best_f1": 0.6218,
+    "train_seconds": 4.5,
+    "scale_pos_weight": 1.0
+  },
+  "E3_time_spw_1": {
+    "threshold": 0.14,
+    "accuracy": 0.9993,
+    "precision": 0.7903,
+    "recall": 0.6533,
+    "f1": 0.7153,
+    "fpr": 0.00023,
+    "roc_auc": 0.9197,
+    "pr_auc": 0.694,
+    "confusion": {
+      "tp": 49,
+      "fp": 13,
+      "tn": 56874,
+      "fn": 26
+    },
+    "val_best_f1": 0.6316,
+    "train_seconds": 2.67,
+    "scale_pos_weight": 1.0,
+    "train_rows": 182276,
+    "val_rows": 45569,
+    "test_rows": 56962
+  },
+  "ieee_reference": {
+    "random_test_f1": 0.7577,
+    "random_test_fpr": 0.0045,
+    "cv_f1": 0.7207,
+    "time_split_f1": 0.5469
+  }
+}

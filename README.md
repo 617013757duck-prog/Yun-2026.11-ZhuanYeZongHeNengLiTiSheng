@@ -58,11 +58,13 @@ python ".\线A_模型训练\training_curve.py"       # A7 训练曲线、学习�
 python ".\线A_模型训练\hyperparam_search.py"     # A8 四组超参数实验
 python ".\线A_模型训练\ablation_study.py"        # A9 六组消融实验
 python ".\线A_模型训练\robustness_check.py"      # A10 5 种子 / 5 折 / 时间外推
+python ".\线A_模型训练\external_validation.py"    # A14 外部数据集（ULB 信用卡欺诈）复现
 python ".\线A_模型训练\batch_predict.py" --input 样例.csv --output 结果.csv --mode raw
 ```
 
 完整方法、实验数据与结论见 [A13 模型与实验报告](线A_模型训练/A13_模型与实验报告.md)。
 关键稳定性结论：5 种子 F1 **0.7596 ± 0.0018**，5 折 CV **0.7207 ± 0.0076**，时间外推 F1 **0.5469**（AUC 仍保留 0.9087）。
+外部复现：在独立的 ULB 信用卡欺诈数据集（284,807 行，欺诈 0.17%）上用同一流程重训，PR-AUC **0.487**（随机基线 282 倍）、FPR **0.1%** 量级，说明方法可跨数据集复现；但模型文件不可跨库直接迁移。
 
 ## 运行演示系统
 
