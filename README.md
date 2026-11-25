@@ -49,6 +49,21 @@ python ".\线A_模型训练\evaluate_report.py"
 
 `数据集/processed/` 已包含预处理结果（`train.csv.gz`、`test.csv.gz`、`category_mapping.json`），只跑训练脚本时可跳过 `preprocess.py`。
 
+## 实验分析（线 A）
+
+训练、选型、评估完成后，可继续复现实验章节的全部图表与数据：
+
+```powershell
+python ".\线A_模型训练\training_curve.py"       # A7 训练曲线、学习曲线
+python ".\线A_模型训练\hyperparam_search.py"     # A8 四组超参数实验
+python ".\线A_模型训练\ablation_study.py"        # A9 六组消融实验
+python ".\线A_模型训练\robustness_check.py"      # A10 5 种子 / 5 折 / 时间外推
+python ".\线A_模型训练\batch_predict.py" --input 样例.csv --output 结果.csv --mode raw
+```
+
+完整方法、实验数据与结论见 [A13 模型与实验报告](线A_模型训练/A13_模型与实验报告.md)。
+关键稳定性结论：5 种子 F1 **0.7596 ± 0.0018**，5 折 CV **0.7207 ± 0.0076**，时间外推 F1 **0.5469**（AUC 仍保留 0.9087）。
+
 ## 运行演示系统
 
 ```powershell
