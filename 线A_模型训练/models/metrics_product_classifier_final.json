@@ -1,0 +1,185 @@
+{
+  "model": "LightGBM multiclass v2",
+  "params": {
+    "objective": "multiclass",
+    "num_class": 5,
+    "metric": "multi_logloss",
+    "subsample": 0.8,
+    "bagging_freq": 5,
+    "colsample_bytree": 0.8,
+    "random_state": 42,
+    "n_jobs": -1,
+    "force_col_wise": true,
+    "learning_rate": 0.05,
+    "num_leaves": 64,
+    "n_estimators": 600
+  },
+  "feature_count": 422,
+  "best_iteration": 150,
+  "测试集": {
+    "accuracy": 0.9989,
+    "f1_macro": 0.9964,
+    "f1_weighted": 0.9989,
+    "f1_per_class": {
+      "C": 1.0,
+      "H": 0.9903,
+      "R": 0.9914,
+      "S": 1.0,
+      "W": 1.0
+    }
+  },
+  "混淆矩阵": [
+    [
+      13788,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      6606,
+      76,
+      0,
+      0
+    ],
+    [
+      0,
+      53,
+      7467,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      2336,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      87782
+    ]
+  ],
+  "classes": [
+    "C",
+    "H",
+    "R",
+    "S",
+    "W"
+  ],
+  "超参数实验": [
+    {
+      "learning_rate": 0.05,
+      "num_leaves": 64,
+      "轮数": 600,
+      "实际轮数": 145,
+      "验证Accuracy": 0.9991,
+      "验证MacroF1": 0.9968,
+      "耗时s": 34.4
+    },
+    {
+      "learning_rate": 0.05,
+      "num_leaves": 64,
+      "轮数": 1200,
+      "实际轮数": 145,
+      "验证Accuracy": 0.9991,
+      "验证MacroF1": 0.9968,
+      "耗时s": 29.4
+    },
+    {
+      "learning_rate": 0.1,
+      "num_leaves": 64,
+      "轮数": 600,
+      "实际轮数": 78,
+      "验证Accuracy": 0.9991,
+      "验证MacroF1": 0.9968,
+      "耗时s": 22.9
+    },
+    {
+      "learning_rate": 0.1,
+      "num_leaves": 64,
+      "轮数": 1200,
+      "实际轮数": 78,
+      "验证Accuracy": 0.9991,
+      "验证MacroF1": 0.9968,
+      "耗时s": 22.2
+    },
+    {
+      "learning_rate": 0.05,
+      "num_leaves": 127,
+      "轮数": 600,
+      "实际轮数": 120,
+      "验证Accuracy": 0.999,
+      "验证MacroF1": 0.9966,
+      "耗时s": 36.8
+    },
+    {
+      "learning_rate": 0.05,
+      "num_leaves": 127,
+      "轮数": 1200,
+      "实际轮数": 120,
+      "验证Accuracy": 0.999,
+      "验证MacroF1": 0.9966,
+      "耗时s": 38.8
+    },
+    {
+      "learning_rate": 0.1,
+      "num_leaves": 127,
+      "轮数": 600,
+      "实际轮数": 62,
+      "验证Accuracy": 0.999,
+      "验证MacroF1": 0.9965,
+      "耗时s": 26.7
+    },
+    {
+      "learning_rate": 0.1,
+      "num_leaves": 127,
+      "轮数": 1200,
+      "实际轮数": 62,
+      "验证Accuracy": 0.999,
+      "验证MacroF1": 0.9965,
+      "耗时s": 26.7
+    }
+  ],
+  "类别权重消融": [
+    {
+      "配置": "无类别权重",
+      "accuracy": 0.9992,
+      "f1_macro": 0.9972,
+      "f1_weighted": 0.9992,
+      "f1_per_class": {
+        "C": 1.0,
+        "H": 0.9924,
+        "R": 0.9934,
+        "S": 1.0,
+        "W": 1.0
+      },
+      "实际轮数": 150
+    },
+    {
+      "配置": "有类别权重",
+      "accuracy": 0.9991,
+      "f1_macro": 0.9968,
+      "f1_weighted": 0.9991,
+      "f1_per_class": {
+        "C": 1.0,
+        "H": 0.9918,
+        "R": 0.9927,
+        "S": 0.9995,
+        "W": 1.0
+      },
+      "实际轮数": 145
+    }
+  ],
+  "v1对照": {
+    "accuracy": 0.9989,
+    "f1_macro": 0.9963,
+    "best_iteration": 161
+  },
+  "泄漏修复说明": "v1 用测试集做 early stopping 验证集, 测试集参与了模型选择; v2 改为训练集内部切 10% 验证集, 测试集仅最后评估一次"
+}

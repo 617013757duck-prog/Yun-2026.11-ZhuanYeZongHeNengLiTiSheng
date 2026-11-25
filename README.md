@@ -49,7 +49,8 @@ python ".\线A_模型训练\model_selection.py"
 python ".\线A_模型训练\train_fraud_baseline.py"
 python ".\线A_模型训练\train_product_classifier.py"
 python ".\线A_模型训练\evaluate_report.py"
-python ".\线A_模型训练\retrain_final.py"   # 生成正式模型 v2
+python ".\线A_模型训练\retrain_final.py"    # 生成正式模型 v2
+python ".\线A_模型训练\retrain_product.py"  # 生成正式分类模型 v2
 ```
 
 `数据集/processed/` 已包含预处理结果（`train.csv.gz`、`test.csv.gz`、`category_mapping.json`），只跑训练脚本时可跳过 `preprocess.py`。
@@ -64,6 +65,10 @@ python ".\线A_模型训练\hyperparam_search.py"     # A8 四组超参数实验
 python ".\线A_模型训练\ablation_study.py"        # A9 六组消融实验
 python ".\线A_模型训练\robustness_check.py"      # A10 5 种子 / 5 折 / 时间外推
 python ".\线A_模型训练\retrain_final.py"         # A15 主线模型重训（v2）+ 三线阈值
+python ".\线A_模型训练\retrain_product.py"       # A20 分类模型重训（v2，修复测试集泄漏）
+python ".\线A_模型训练\robustness_v2.py"         # A17 v2 配置稳定性重验
+python ".\线A_模型训练\calibration_subgroup.py"  # A18 概率校准 + 子群体召回
+python ".\线A_模型训练\topk_fp_analysis.py"      # A19 Top-K 捕获率 + 误报归因
 python ".\线A_模型训练\test_inference_api.py"    # A11 接口用例（30 项断言）
 python ".\线A_模型训练\external_validation.py"    # A14 外部数据集（ULB 信用卡欺诈）复现
 python ".\线A_模型训练\multi_dataset_validation.py"  # A16 四数据集复现验证
@@ -74,10 +79,12 @@ python ".\线A_模型训练\batch_predict.py" --input 样例.csv --output 结果
 
 关键结论：
 
-- **稳定性**：5 种子 F1 **0.7596 ± 0.0018**，5 折 CV **0.7207 ± 0.0076**
-- **时间外推**：F1 降至 0.51，但 AUC 保留 0.91 —— 排序能力几乎不衰减，掉分来自固定阈值失效，部署需按月重校准
+- **业务价值**：人工只审分数前 **1%（1,181 笔）即可抓到 28.55% 的欺诈，命中率 99.92%**（基线的 29 倍）。对外汇报以此为主指标
+- **稳定性**：5 种子 F1 **0.8116 ± 0.0010**，5 折 CV **0.8127 ± 0.0075**（显著优于 HGB，p=7.51e-07）
+- **时间外推**：F1 降至 0.5362（理论上限 0.5399），但 AUC 保留 0.9002 —— 排序能力保留 92.6%，掉分来自固定阈值失效，部署需按月重校准
 - **多数据集复现**：在 ULB（28.5 万）、Nooha（132 万）、Sparkov（30 万）、银行交易合成集（5 千）上用同一流程重训，ROC-AUC 全部 ≥ 0.9689、PR-AUC ≥ 0.8659，说明方法可跨数据集复现；但模型文件不可跨库直接迁移
 - **反直觉结论**：类别权重与阈值调优应择一不可叠加（IEEE-CIS 上 spw=1 使 F1 +3.97%，ULB 上 v2 配置比 v1 高 8 倍 F1）
+- **概率校准**：原始分数 ECE 0.00841 偏保守，Platt 校准后降至 0.00113 且不改变排序
 
 ## 运行演示系统
 

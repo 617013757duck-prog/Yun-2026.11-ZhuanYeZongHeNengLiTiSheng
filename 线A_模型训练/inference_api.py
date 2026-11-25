@@ -16,7 +16,7 @@
 依赖产物(均由 preprocess.py 生成):
     数据集/processed/category_mapping.json
     线A_模型训练/models/lgbm_fraud_final.txt
-    线A_模型训练/models/lgbm_product_classifier.txt
+    线A_模型训练/models/lgbm_product_classifier_final.txt
     线A_模型训练/models/metrics_fraud_final.json
 """
 from __future__ import annotations
@@ -35,9 +35,9 @@ PROC = BASE.parent / "数据集" / "processed"
 MODEL_DIR = BASE / "models"
 
 FRAUD_MODEL = MODEL_DIR / "lgbm_fraud_final.txt"
-PRODUCT_MODEL = MODEL_DIR / "lgbm_product_classifier.txt"
+PRODUCT_MODEL = MODEL_DIR / "lgbm_product_classifier_final.txt"
 FRAUD_METRICS = MODEL_DIR / "metrics_fraud_final.json"
-PRODUCT_METRICS = MODEL_DIR / "metrics_product_classifier.json"
+PRODUCT_METRICS = MODEL_DIR / "metrics_product_classifier_final.json"
 MAPPING = PROC / "category_mapping.json"
 SPEC_CACHE = MODEL_DIR / "feature_spec.json"
 

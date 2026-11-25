@@ -21,9 +21,9 @@ MODEL_DIR = ROOT / "线A_模型训练" / "models"
 PROC_DIR = ROOT / "数据集" / "processed"
 
 FRAUD_MODEL = MODEL_DIR / "lgbm_fraud_final.txt"
-PRODUCT_MODEL = MODEL_DIR / "lgbm_product_classifier.txt"
+PRODUCT_MODEL = MODEL_DIR / "lgbm_product_classifier_final.txt"
 FRAUD_METRICS = MODEL_DIR / "metrics_fraud_final.json"
-PRODUCT_METRICS = MODEL_DIR / "metrics_product_classifier.json"
+PRODUCT_METRICS = MODEL_DIR / "metrics_product_classifier_final.json"
 
 WARN_THRESHOLD = 0.08  # “关注”预警线兜底值, 正常由线A metrics 产物覆盖
 
